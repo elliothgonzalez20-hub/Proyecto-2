@@ -12,9 +12,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Estudiantes extends Model
 {
     use HasFactory;
-    public function representantes(): BelongsTo
+    public function representante(): BelongsTo
     {
-        return $this->belongsTo(Estudiantes::class);
+        return $this->belongsTo(Representantes::class, 'representante_id');
     }
 
     public function asignaturas(): hasmany
@@ -24,5 +24,14 @@ class Estudiantes extends Model
 
     use SoftDeletes;
 
-     protected $fillable = [];
+     protected $fillable = [
+    'name',
+    'apellidos',
+    'nacionalidad',
+    'cedula',
+    'nacimiento', 
+    'genero',
+    'lugar',
+    'representante_id',
+     ];
 }

@@ -11,7 +11,7 @@ class Representantes extends Model
 {
     use HasFactory;
 
-    public function estudiantes(): HasMany
+    public function estudiante(): HasMany
     {
         return $this->hasMany(Estudiantes::class);
     }

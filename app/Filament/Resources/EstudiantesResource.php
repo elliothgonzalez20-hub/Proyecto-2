@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EstudiantesResource\Pages;
 use App\Filament\Resources\EstudiantesResource\RelationManagers;
+use App\Filament\Resources\EstudiantesResource\RelationManagers\RepresentantesRelationManager;
 use App\Models\Estudiantes;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -22,7 +23,7 @@ use Filament\Actions\RestoreAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\DatePicker;
-
+use Filament\Forms\Components\Section;
 class EstudiantesResource extends Resource
 {
     protected static ?string $model = Estudiantes::class;
@@ -92,7 +93,27 @@ class EstudiantesResource extends Resource
                 ->required()
                 ->maxLength(255)
                 ,
-
+                
+                Section::make('Datos de representantes')
+                ->relationship('representante') 
+                ->schema([
+                    Forms\Components\TextInput::make('name')
+                        ->label('Nombres')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('apellidos')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\Select::make('nacionalidad')
+                        ->options([
+                            'Venezolana' => 'Venezolana',
+                            'Extranjera' => 'Extranjera',
+                        ])
+                        ->required(),
+                    Forms\Components\TextInput::make('cedula')
+                        ->label('Cédula de Identidad')
+                        ->required(),
+                ]),
         
             ]);
     }
@@ -120,14 +141,26 @@ class EstudiantesResource extends Resource
                 ->label('Lugar de nacimiento'),
             ])
             ->filters([
-                 TrashedFilter::make(),
+                 TrashedFilter::make()
+                 ->label('Registros inhabilitados')
+                 ->truelabel('Solo registros inhabilitados')
+                 ->falselabel('Ocultar inhabilitados')
+                 ->placeholder('Todos los registros')
+                 ,
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                    ->label('Inhabilitar seleccionados')
+                    ->modalHeading('¿Inhabilitar estos registros?')
+                    ->modalDescription('¿Estas seguro de inhabilitar estos registros?')
+                    ->modalSubmitActionLabel("Inhabilitar")
+                    ->color("warning")
+                    ,
+                    
                 ]),
             ]);
     }
@@ -136,6 +169,7 @@ class EstudiantesResource extends Resource
     {
         return [
             //
+            //RepresentantesRelationManager::class,//
         ];
     }
 

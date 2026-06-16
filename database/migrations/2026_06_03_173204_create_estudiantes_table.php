@@ -24,7 +24,10 @@ return new class extends Migration
             $table->string('lugar');
             //$table->string('email');//
             ///$table->string('phone');//
-            //$table->foreignId('asignatura_id')->constrained('asignaturas')->cascadeOnDelete();//
+            $table->foreignId('representante_id')
+            ->nullable()
+            ->constrained('Representantes')
+            ->cascadeOnDelete();
             $table->timestamps();
         });
                 {

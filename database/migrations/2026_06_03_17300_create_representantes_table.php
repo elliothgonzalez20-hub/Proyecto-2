@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('representantes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email');
-            $table->string('phone');
+            $table->string('apellidos');
+            $table->string('nacionalidad');
+            $table->string('cedula');
+            //$table->string('parentezco');
             $table->timestamps();
         });
     }
