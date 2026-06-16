@@ -9,6 +9,8 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -16,7 +18,10 @@ use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Filament\Forms\Components\Select;
 use Ramsey\Uuid\Type\Integer;
-
+use Filament\Actions\RestoreAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\DatePicker;
 
 class EstudiantesResource extends Resource
 {
@@ -30,8 +35,64 @@ class EstudiantesResource extends Resource
             ->schema([
             
                  TextInput::make('name')
+                 ->label('Nombres')
                  ->required()
                  ->maxLength('255'),
+
+                 TextInput::make("apellidos")
+                ->required()
+                ->maxLength(255),
+
+                 Select::make('nacionalidad')
+                ->options([
+                    'Venezonalana'=> 'Venezolana',
+                    'Extranjera'=> 'Extranjera',
+                ])
+                ->required(),
+
+                 TextInput::make('cedula')
+                 ->label('Cédula de Identidad')
+                 ->rules(['regex:/^[0-9]+$/'])
+                 ->extraInputAttributes([
+                    'inputmode' => 'numeric', 
+                    'oninput' => "this.value = this.value.replace(/[^0-9]/g, '')"
+                        ])
+                 ->validationMessages([
+                    'regex' => 'La cédula no puede tener letras, espacios ni caracteres especiales.',
+                        ])
+                 ->unique(
+                    table: 'estudiantes',
+                    column: 'cedula',
+                    ignoreRecord: true,
+                    modifyRuleUsing: function (\Illuminate\Validation\Rules\Unique $rule) {
+                    return $rule->where('cedula', request()->input('components.0.updates.data.cedula')); 
+                     })
+                        ->validationMessages([
+                        'unique' => 'Esta cédula ya se encuentra registrada.',
+                ])
+                ->required()
+                ->unique() 
+                ->maxLength(255),
+
+                DatePicker::make('nacimiento')
+                ->label('Fecha de Nacimiento')
+                ->required()
+                ->maxDate(now()),
+
+                Select::make('genero')
+                ->label('Sexo')
+                ->options([
+                    'Masculino'=> 'Masculino',
+                    'Femenino'=> 'Femenino',
+                ])
+                ->required(),
+
+                TextInput::make('lugar')
+                ->label('Lugar de nacimiento')
+                ->required()
+                ->maxLength(255)
+                ,
+
         
             ]);
     }
@@ -41,9 +102,25 @@ class EstudiantesResource extends Resource
         return $table
             ->columns([
                 //
+                TextColumn::make('name')
+                ->label('Nombre')
+                ->sortable()
+                ->searchable(),
+                TextColumn::make('apellidos')->searchable(),
+                TextColumn::make('nacionalidad'),
+                TextColumn::make('cedula')
+                ->label('Cédula de identidad')
+                ->sortable()
+                ->searchable(),
+                TextColumn::make('nacimiento')
+                ->label('Fecha de nacimiento'),
+                TextColumn::make('genero')
+                ->label('Sexo'),
+                TextColumn::make('lugar')
+                ->label('Lugar de nacimiento'),
             ])
             ->filters([
-                //
+                 TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

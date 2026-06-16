@@ -6,6 +6,8 @@ use illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use illuminate\Database\Eloquent\Relations\BelongsTo;
 use illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class Estudiantes extends Model
 {
@@ -20,4 +22,7 @@ class Estudiantes extends Model
         return $this->hasMany(Asignaturas::class);
     }
 
+    use SoftDeletes;
+
+     protected $fillable = [];
 }
