@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('representantes', function (Blueprint $table) {
+        Schema::create('periodos', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('apellidos');
-            $table->string('nacionalidad');
-            $table->string('cedula');
-            //$table->string('parentesco');//
+            $table->string('nombre');
+            $table->date('fecha_inicio')->nullable();
+            $table->date('fecha_fin')->nullable();
+            $table->boolean('activo')->default(true);
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('representantes');
+        Schema::dropIfExists('periodos');
     }
 };

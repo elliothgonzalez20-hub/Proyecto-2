@@ -9,17 +9,25 @@ use illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
-class Estudiantes extends Model
+class Estudiante extends Model
 {
-    use HasFactory;
+    protected $table = 'estudiantes';
+
+    protected $guarded = [];
+
     public function representante(): BelongsTo
     {
-        return $this->belongsTo(Representantes::class, 'representante_id');
+        return $this->belongsTo(Representante::class, 'representante_id');
     }
 
-    public function asignaturas(): hasmany
+    public function asignatura(): HasMany
     {
-        return $this->hasMany(Asignaturas::class);
+        return $this->hasMany(Asignatura::class);
+    }
+
+    public function inscripcion(): HasMany
+    {
+        return $this->hasMany(Inscripcion::class);
     }
 
     use SoftDeletes;
@@ -34,4 +42,5 @@ class Estudiantes extends Model
     'lugar',
     'representante_id',
      ];
+
 }

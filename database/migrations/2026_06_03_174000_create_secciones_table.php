@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('representantes', function (Blueprint $table) {
+        Schema::create('secciones', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('apellidos');
-            $table->string('nacionalidad');
-            $table->string('cedula');
-            //$table->string('parentesco');//
+            $table->string('grado_ano'); 
+            $table->string('letra'); 
+            $table->integer('cupo_maximo')->default(35);
+            $table->foreignId('profesor_guia_id')->nullable()->constrained('profesores')->nullOnDelete();
+            $table->dropColumn('profesor_guia_id');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('representantes');
+        Schema::dropIfExists('secciones');
     }
 };

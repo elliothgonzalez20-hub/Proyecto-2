@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('asignaturas', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('grado');
-            $table->string('type');
-            $table->foreignId('estudiante_id')->constrained('estudiantes')->cascadeOnDelete();
+            $table->string('nombre');  
+            $table->string('codigo')->unique();
+            $table->string('grado_ano');
+            $table->foreignId('profesor_id')->nullable()->constrained('profesores')->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -7,12 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\relations\BelongsTo;
 use Illuminate\Database\Eloquent\relations\HasMany;
 
-class Representantes extends Model
+class Representante extends Model
 {
+    protected $table = 'representantes';
+
+    protected $guarded = [];
+    
     use HasFactory;
 
     public function estudiante(): HasMany
     {
-        return $this->hasMany(Estudiantes::class);
+        return $this->hasMany(Estudiante::class);
     }
+
 }

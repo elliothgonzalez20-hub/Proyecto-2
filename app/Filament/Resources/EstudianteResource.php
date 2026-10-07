@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\EstudiantesResource\Pages;
-use App\Filament\Resources\EstudiantesResource\RelationManagers;
-use App\Filament\Resources\EstudiantesResource\RelationManagers\RepresentantesRelationManager;
-use App\Models\Estudiantes;
+use App\Filament\Resources\EstudianteResource\Pages;
+use App\Filament\Resources\EstudianteResource\RelationManagers;
+use App\Filament\Resources\EstudianteResource\RelationManagers\RepresentantesRelationManager;
+use App\Models\Estudiante;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -24,9 +24,9 @@ use Filament\Actions\ForceDeleteAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
-class EstudiantesResource extends Resource
+class EstudianteResource extends Resource
 {
-    protected static ?string $model = Estudiantes::class;
+    protected static ?string $model = Estudiante::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -70,9 +70,9 @@ class EstudiantesResource extends Resource
                      })
                         ->validationMessages([
                         'unique' => 'Esta cédula ya se encuentra registrada.',
-                ])
+                        ])
                 ->required()
-                ->unique() 
+                ->unique(ignoreRecord: true) 
                 ->maxLength(255),
 
                 DatePicker::make('nacimiento')
@@ -94,7 +94,47 @@ class EstudiantesResource extends Resource
                 ->maxLength(255)
                 ,
                 
+                
                 Section::make('Datos de representantes')
+                     ->schema([
+                      Select::make('representante_id')
+                     ->label('Cédula del Representante')
+                     ->relationship('representante', 'cedula')
+                     ->getOptionLabelFromRecordUsing(fn ($record) => "C.I. {$record->cedula} - {$record->name} {$record->apellidos}")
+                     ->searchable()
+                     ->preload()
+                     ->required()
+                     ->createOptionForm([
+                        TextInput::make('name')
+                        ->label('Nombres')
+                        ->required()
+                        ->maxLength(255),
+
+                       TextInput::make('apellidos')
+                        ->label('Apellidos')
+                        ->required()
+                        ->maxLength(255),
+
+                       /*TextInput::make('parentesco')
+                       ->label('Parentesco')
+                       ->required()
+                       ->maxLength(255),*/
+
+                       Select::make('nacionalidad')
+                        ->label('Nacionalidad')
+                        ->options([
+                        'Venezolana' => 'Venezolana',
+                        'Extranjera' => 'Extranjera',
+                          ])
+                     ->required(),
+
+                     TextInput::make('cedula')
+                       ->label('Cédula de Identidad')
+                       ->required()
+                       ->unique('representantes', 'cedula'),
+                        ]), 
+    
+                /*Section::make('Datos de representantes')
                 ->relationship('representante') 
                 ->schema([
                     Forms\Components\TextInput::make('name')
@@ -112,7 +152,7 @@ class EstudiantesResource extends Resource
                         ->required(),
                     Forms\Components\TextInput::make('cedula')
                         ->label('Cédula de Identidad')
-                        ->required(),
+                        ->required(),*/
                 ]),
         
             ]);
@@ -176,9 +216,9 @@ class EstudiantesResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEstudiantes::route('/'),
-            'create' => Pages\CreateEstudiantes::route('/create'),
-            'edit' => Pages\EditEstudiantes::route('/{record}/edit'),
+            'index' => Pages\ListEstudiante::route('/'),
+            'create' => Pages\CreateEstudiante::route('/create'),
+            'edit' => Pages\EditEstudiante::route('/{record}/edit'),
         ];
     }
 }
