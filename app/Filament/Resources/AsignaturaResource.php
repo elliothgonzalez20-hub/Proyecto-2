@@ -20,8 +20,9 @@ use App\Models\Profesor;
 class AsignaturaResource extends Resource
 {
     protected static ?string $model = Asignatura::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Estructura Académica';
+    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {

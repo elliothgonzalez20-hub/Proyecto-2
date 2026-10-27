@@ -67,7 +67,12 @@ class AdminPanelProvider extends PanelProvider
                         ->directory('images/swisnl/filament-backgrounds/curated-by-swis/')
                 ),
         ])
-            ;
+            ->navigationGroups([
+            'Gestión de Alumnos',
+            'Estructura Académica',
+            'Procesos Escolares',
+        ])
+        ;
             
     }
 }

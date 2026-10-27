@@ -18,12 +18,15 @@ use Filament\Forms\Get;
 use App\Models\Seccion;
 use Filament\Tables\Actions\Action;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Tables\Filters\SelectFilter;
+use App\Models\Periodo;
 
 class InscripcionResource extends Resource
 {
     protected static ?string $model = Inscripcion::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Estructura Académica';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
@@ -171,7 +174,11 @@ class InscripcionResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('periodo_id')
                     ->relationship('periodo', 'nombre')
-                    ->label('Filtrar por Periodo'),
+                    ->label('Periodo Escolar')
+                    ->default(function () {
+                        return Periodo::where('activo', true)->value('id');
+                    })
+                    ->native(false),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

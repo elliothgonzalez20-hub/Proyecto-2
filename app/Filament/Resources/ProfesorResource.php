@@ -16,7 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class ProfesorResource extends Resource
 {
     protected static ?string $model = Profesor::class;
-
+    protected static ?string $navigationLabel = 'Profesores';
+    protected static ?string $navigationGroup = 'Estructura Académica';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form

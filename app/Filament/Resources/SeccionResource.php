@@ -16,12 +16,16 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\ViewField;
 use Illuminate\Support\HtmlString;
+use App\Models\Periodo;
+use App\Models\Inscripcion;
 
 class SeccionResource extends Resource
 {
     protected static ?string $model = Seccion::class;
-
+    protected static ?string $navigationLabel = 'Secciones';
+    protected static ?string $navigationGroup = 'Estructura Académica';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -60,6 +64,18 @@ class SeccionResource extends Resource
                     ->counts('inscripciones')
                     ->badge()
                     ->color('info')
+                    ->getStateUsing(function ($record) {
+            
+                        $periodoActivoId = Periodo::where('activo', true)->value('id');
+                
+                        if (!$periodoActivoId) {
+                            return 0;
+                        }
+                
+                        return \App\Models\Inscripcion::where('seccion_id', $record->id)
+                            ->where('periodo_id', $periodoActivoId)
+                            ->count();
+                    })
                     ->action(
                         Action::make('verEstudiantes')
                             ->label('Ver Estudiantes')
@@ -67,27 +83,32 @@ class SeccionResource extends Resource
                             ->modalSubmitAction(false)
                             ->modalCancelActionLabel('Cerrar')
                             ->modalContent(function ($record) {
-
-                                $inscripciones = $record->inscripciones()->with('estudiante')->get();
-                
+                               
+                                $periodoActivoId = \App\Models\Periodo::where('activo', true)->value('id');
+                        
+                                $inscripciones = $record->inscripciones()
+                                    ->with('estudiante')
+                                    ->where('periodo_id', $periodoActivoId)
+                                    ->get();
+                        
                                 if ($inscripciones->isEmpty()) {
                                     return new HtmlString('<p class="text-gray-500 py-4 text-center">No hay estudiantes inscritos en esta sección todavía.</p>');
                                 }
-                
-                                $html = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-gray-700"><th class="py-2 px-3">Cédula</th><th class="py-2 px-3">Nombre del Estudiante</th></tr></thead><tbody>';
-                                
+                        
+                                $html = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead class="border-b border-gray-700"><tr><th class="py-2 px-3">Cédula</th><th class="py-2 px-3">Estudiante</th></tr></thead><tbody>';
+                        
                                 foreach ($inscripciones as $inscripcion) {
                                     $estudiante = $inscripcion->estudiante;
                                     $cedula = $estudiante->cedula ?? 'N/A';
                                     $nombre = trim(
-                                        ($estudiante->name ?? $estudiante->name ?? '') . ' ' . 
+                                        ($estudiante->name ?? $estudiante->nombres ?? '') . ' ' . 
                                         ($estudiante->apellidos ?? $estudiante->apellido ?? '')
                                     );
                                     $html .= "<tr class='border-b border-gray-800'><td class='py-2 px-3'>{$cedula}</td><td class='py-2 px-3'>{$nombre}</td></tr>";
                                 }
                                 
                                 $html .= '</tbody></table></div>';
-                
+                        
                                 return new HtmlString($html);
                             })
                         ),
@@ -95,6 +116,16 @@ class SeccionResource extends Resource
                     ->label('Cupos Disponibles')
                     ->getStateUsing(fn ($record) => $record->cupos_disponibles)
                     ->badge()
+                    ->getStateUsing(function ($record) {
+                        $periodoActivoId = Periodo::where('activo', true)->value('id');
+                        if (!$periodoActivoId) return $record->cupo_maximo;
+                
+                        $inscritosActivos = Inscripcion::where('seccion_id', $record->id)
+                            ->where('periodo_id', $periodoActivoId)
+                            ->count();
+                
+                        return $record->cupo_maximo - $inscritosActivos;
+                    })
                     ->color(fn ($state) => $state > 0 ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

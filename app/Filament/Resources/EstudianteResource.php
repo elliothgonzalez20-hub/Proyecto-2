@@ -24,11 +24,15 @@ use Filament\Actions\ForceDeleteAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
+use Filament\Tables\Actions\Action;
+
 class EstudianteResource extends Resource
 {
     protected static ?string $model = Estudiante::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Gestión de Alumnos';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationLabel = 'Estudiantes';
 
     public static function form(Form $form): Form
     {
@@ -189,7 +193,12 @@ class EstudianteResource extends Resource
                  ,
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Action::make('historial_academico')
+                    ->label('Historial PDF')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('success')
+                    ->url(fn ($record) => route('reporte.historial', $record->id))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
